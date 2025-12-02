@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Supporting Local Shops in pusok Lapu-lapu City</title>
+
+<style>
+    html { scroll-behavior: smooth; height: 100%; }
+    body { margin: 0; padding: 0; font-family: Arial, sans-serif; height: 100%; }
+
+    nav {
+        position: fixed;      
+        width: 100%;
+        top: 0; left: 0;
+        z-index: 1000;
+        background-color: rgba(0,0,0,0.3); 
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+    }
+
+    nav ul { margin: 0; padding: 0; display: flex; list-style: none; background: transparent; }
+    nav ul li { position: relative; }
+    nav ul li a {
+        display: block;
+        padding: 20px;
+        color: rgba(255,255,255,0.8);
+        text-decoration: none;
+        transition: background-color 0.3s, color 0.3s;
+    }
+    nav ul li a:hover { background-color: rgba(128,128,128,0.3); color: rgba(255,255,255,1); }
+    ul li.services { margin-left: auto; }
+
+    /* Dropdown */
+    .dropdown-content {
+        display: none;
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background-color: rgba(0,0,0,0.8);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        min-width: 220px;
+        list-style: none;
+        padding: 10px;
+        border-radius: 5px;
+        z-index: 1000;
+
+        /* NEW: Scrollable area */
+        max-height: 220px; /* ~ fits 4 items */
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255,255,255,0.4) transparent;
+    }
+
+    .dropdown-content li { margin-bottom: 10px; }
+    .dropdown-content li:last-child { margin-bottom: 0; }
+    .dropdown-content li a {
+        padding: 12px;
+        background-color: rgba(255,255,255,0.08);
+        border-radius: 5px;
+        color: rgba(255,255,255,0.9);
+        text-decoration: none;
+        transition: 0.3s;
+        display: block;
+    }
+    .dropdown-content li a:hover { background-color: rgba(255,255,255,0.18); }
+    .shop-title { font-size: 15px; font-weight: bold; text-align: left; }
+    .shop-desc { font-size: 12px; opacity: 0.85; margin-top: 3px; text-align: left; }
+    ul li.services:hover .dropdown-content { display: block; }
+
+    /* SECTION STYLES */
+    section {
+        min-height: 100vh;
+        display: flex;
+        color: white;
+        text-shadow: 1px 1px 2px black;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        padding-top: 60px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* Overlay for readability */
+    section .overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.4);
+        z-index: 0;
+    }
+
+    .section-content { 
+        padding-left: 40px; 
+        padding-top: 130px; 
+        max-width: 500px; 
+        opacity: 0;
+        transform: translateX(-40px);
+        animation: contentSlideIn 1s ease forwards;
+        animation-delay: 0.2s;
+        position: relative;
+        z-index: 1;
+    }
+
+    @keyframes contentSlideIn {
+        from { opacity: 0; transform: translateX(-40px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+
+    .section-title { font-size: 42px; margin: 0; font-weight: 800; text-shadow: 1px 1px 6px rgba(0,0,0,0.7); }
+    .section-desc, .shop-details p { font-size: 18px; opacity: 0.92; line-height: 1.4; text-shadow: 1px 1px 6px rgba(0,0,0,0.7); }
+
+    #Home { 
+        background-image: url('mainbg.jpg'); 
+        height: 100vh; 
+        margin: 0; 
+        padding-top: 0;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+    }
+
+    .home-title-link { text-decoration: none; display: inline-block; color: white; }
+    #Home .section-title {
+        font-weight: 900;
+        transition: transform 0.3s ease, color 0.3s ease;
+        cursor: pointer;
+        opacity: 0;
+        transform: translateY(-30px);
+        animation: homeTitleFade 1.1s ease forwards;
+    }
+    #Home .section-desc {
+        opacity: 0;
+        transform: translateY(20px);
+        animation: homeDescFade 1.1s ease forwards;
+        animation-delay: 0.4s;
+    }
+
+    @keyframes homeTitleFade {
+        from { opacity: 0; transform: translateY(-30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes homeDescFade {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    #Home .section-title:hover { color: #FFD700; transform: scale(1.05); text-shadow: 2px 2px 6px rgba(0,0,0,0.5); }
+
+    #Shop1 { background-image: url('shop1.jpg'); }
+    #Shop2 { background-image: url('shop2.jpg'); }
+    #Shop3 { background-image: url('shop3.jpg'); }
+    #Shop4 { background-image: url('shop4.jpg'); }
+    #Shop5 { background-image: url('shop5.jpg'); }
+    #Shop6 { background-image: url('shop6.jpg'); }
+    #Shop7 { background-image: url('shop7.jpg'); }
+    #Shop8 { background-image: url('shop8.jpg'); }
+    #Shop9 { background-image: url('shop9.jpg'); }
+
+    #Contact { 
+        background-image: url('contact.jpg');
+        justify-content: center;      
+        align-items: flex-start;      
+        text-align: center;
+        padding-top: 80px;   
+    }
+
+    .contact-wrapper {
+        margin-top: 30px;
+        display: flex;
+        justify-content: center; 
+        gap: 30px;
+        flex-wrap: nowrap;
+    }
+
+    .contact-card {
+        background: rgba(255,255,255,0.12);
+        width: 220px;
+        height: 150px;
+        padding: 20px;
+        flex: 0 0 220px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        border-radius: 14px;
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+        text-align: center;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+        transition: 0.3s ease;
+        overflow: hidden;
+        border-left: 3px solid transparent;
+        border-right: 3px solid transparent;
+        will-change: transform;
+        animation: fadeIn 1.1s ease;
+    }
+
+    .contact-card:hover {
+        background: rgba(255,255,255,0.18);
+        transform: translateY(-6px);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.45);
+        border-left: 3px solid rgba(255,255,255,0.8);
+        border-right: 3px solid rgba(255,255,255,0.8);
+    }
+
+    .contact-card strong { font-size: 20px; display: block; margin-bottom: 8px; }
+    .contact-card span { opacity: 0.9; font-size: 16px; }
+
+    #About { 
+        background-image: url('about.jpg');
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 0;
+        text-align: center;
+    }
+
+    .about-wrapper { width: 100%; display: flex; justify-content: center; padding: 120px 20px; }
+    .about-card {
+        max-width: 650px;
+        padding: 40px 50px;
+        background: rgba(255,255,255,0.14);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-radius: 18px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.35);
+        animation: fadeIn 1.1s ease;
+        border-left: 3px solid rgba(255,255,255,0.5);
+        border-right: 3px solid rgba(255,255,255,0.5);
+        transition: transform 0.35s ease, box-shadow 0.35s ease,
+                    background 0.35s ease, border-color 0.35s ease;
+    }
+
+    .about-card:hover {
+        transform: scale(1.04);
+        background: rgba(255,255,255,0.22);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.45);
+        border-left: 3px solid rgba(255,255,255,0.8);
+        border-right: 3px solid rgba(255,255,255,0.8);
+    }
+
+    .about-title { margin-bottom: 20px; font-size: 45px; font-weight: 900; text-shadow: 1px 1px 3px black; }
+    .about-text { font-size: 18px; line-height: 1.6; opacity: 0.95; }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* MAP BOX STYLE */
+    .map-box {
+        position: absolute;
+        bottom: 120px; 
+        right: 20px;
+        width: 260px;
+        height: 180px;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+        border: 2px solid rgba(255,255,255,0.5);
+        opacity: 0;
+        transform: translateY(40px);
+        animation: slideIn 0.9s ease-out forwards;
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+        z-index: 1;
+    }
+
+    .map-box:hover { transform: scale(1.08) translateY(0); box-shadow: 0 8px 20px rgba(0,0,0,0.55); }
+    @keyframes slideIn { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Shop gallery */
+    .shop-gallery {
+        position: absolute;
+        top: 150px;
+        right: 100px;
+        display: flex;
+        gap: -20px;
+        z-index: 2;
+    }
+
+    .shop-gallery img {
+        width: 120px;
+        height: 120px;
+        object-fit: cover;
+        border: 3px solid rgba(255,255,255,0.8);
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.5s ease;
+        opacity: 0;
+        transform: translateY(20px);
+        animation: shopFadeSlide 0.6s forwards;
+    }
+
+    .shop-gallery img:nth-child(1) { animation-delay: 0.1s; }
+    .shop-gallery img:nth-child(2) { animation-delay: 0.3s; }
+    .shop-gallery img:nth-child(3) { animation-delay: 0.5s; }
+
+    .shop-gallery img:hover {
+        transform: scale(1.15);
+        z-index: 5;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.6);
+    }
+
+    @keyframes shopFadeSlide {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+
+ /* --------------------------- */
+    /* MOBILE FIX FOR LOCAL SHOPS  */
+    /* --------------------------- */
+    @media (max-width: 768px) {
+
+        /* Stack layout vertically */
+        section[id^="Shop"] {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 80px;
+            padding-bottom: 40px;
+            text-align: center;
+        }
+
+        /* Fix text alignment */
+        section[id^="Shop"] .section-content {
+            padding: 0 20px;
+            max-width: 100%;
+            transform: none !important;
+        }
+
+        /* Fix gallery */
+        section[id^="Shop"] .shop-gallery {
+            position: static;
+            margin: 20px auto 10px auto;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        section[id^="Shop"] .shop-gallery img {
+            width: 90px;
+            height: 90px;
+        }
+
+        /* Fix map alignment */
+        section[id^="Shop"] .map-box {
+            position: static;
+            width: 85%;
+            height: 200px;
+            margin: 20px auto 0 auto;
+            transform: none !important;
+        }
+    }
+
+@media (max-width: 768px) {
+
+    nav ul {
+        flex-wrap: wrap;
+        text-align: center;
+    }
+
+    nav ul li a {
+        padding: 14px;
+        font-size: 14px;
+    }
+
+    .dropdown-content {
+        right: 0;
+        left: 0;
+        min-width: 100%;
+        border-radius: 0;
+    }
+
+    .section-content {
+        max-width: 90%;
+        padding-left: 20px;
+        padding-top: 100px;
+    }
+
+    .section-title {
+        font-size: 30px;
+    }
+
+    .section-desc,
+    .shop-details p {
+        font-size: 15px;
+    }
+
+    .shop-gallery {
+        position: static;
+        margin-top: 20px;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .shop-gallery img {
+        width: 90px;
+        height: 90px;
+    }
+
+    .map-box {
+        position: static;
+        margin: 30px auto;
+        width: 80%;
+        height: 200px;
+        transform: none;
+    }
+
+    .contact-wrapper {
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .contact-card {
+        width: 90%;
+        height: auto;
+        padding: 15px;
+    }
+
+    .about-wrapper {
+        padding: 80px 15px;
+    }
+
+    .about-card {
+        max-width: 95%;
+        padding: 25px;
+    }
+
+    .about-title {
+        font-size: 32px;
+    }
+
+    .about-text {
+        font-size: 16px;
+    }
+}
+
+/* --------------------------- */
+/*   SMALL PHONES ADJUSTMENTS  */
+/* --------------------------- */
+@media (max-width: 480px) {
+
+    nav ul li a {
+        padding: 12px;
+        font-size: 13px;
+    }
+
+    .section-title {
+        font-size: 24px;
+    }
+
+    .section-desc,
+    .shop-details p {
+        font-size: 14px;
+    }
+
+    .shop-gallery img {
+        width: 75px;
+        height: 75px;
+    }
+
+    .map-box {
+        height: 160px;
+    }
+
+    .contact-card strong {
+        font-size: 18px;
+    }
+
+    .contact-card span {
+        font-size: 14px;
+    }
+}
+
+</style>
+</head>
+<body>
+
+<nav>
+    <ul>
+        <li><a href="#Home">Home</a></li>
+        <li><a href="#Contact">Contact Us</a></li>
+        <li><a href="#About">About Us</a></li>
+        <li class="services">
+            <a href="javascript:void(0)">Local Shops &#x25BC;</a>
+            <ul class="dropdown-content">
+                <li><a href="#Shop1"><div class="shop-title">Euro Pinoy</div><div class="shop-desc">Food & Restaurant</div></a></li>
+                <li><a href="#Shop2"><div class="shop-title">Kuya Wins Street Food</div><div class="shop-desc">Food & Restaurant</div></a></li>
+                <li><a href="#Shop3"><div class="shop-title">Susan's Pasalubong</div><div class="shop-desc">Food & Giftshop</div></a></li>
+                <li><a href="#Shop4"><div class="shop-title">Vinzjack Tasty Bread</div><div class="shop-desc">Food</div></a></li>
+                <li><a href="#Shop5"><div class="shop-title">Pasalubong Republique</div><div class="shop-desc">Food & Giftshop</div></a></li>
+                <li><a href="#Shop6"><div class="shop-title">Happy Manok</div><div class="shop-desc">Food</div></a></li>
+                <li><a href="#Shop7"><div class="shop-title">Cariños Lechon Leimpo</div><div class="shop-desc">Food</div></a></li>
+                <li><a href="#Shop8"><div class="shop-title">Dapogan Restaurant</div><div class="shop-desc">Food & Restaurant</div></a></li>
+                <li><a href="#Shop9"><div class="shop-title">Chenoi Apparel</div><div class="shop-desc">Tailoring</div></a></li>
+            </ul>       
+        </li>
+    </ul>
+</nav>
+
+<section id="Home">
+    <div class="overlay"></div>
+    <div>
+        <a href="#About" class="home-title-link">
+            <h1 class="section-title">Supporting Local Shops in pusok Lapu-lapu City</h1>
+        </a>
+        <div class="section-desc">Welcome to our Website — discover the best local stores around you.</div>
+    </div>
+</section>
+
+<section id="Shop1">
+    <div class="overlay"></div>
+    <div class="shop-gallery">
+        <img src="shop1pic1.jpg" alt="Shop Image 1">
+        <img src="shop1pic2.jpg" alt="Shop Image 2">
+        <img src="shop1pic3.jpg" alt="Shop Image 3">
+    </div>
+    <div class="section-content">
+        <h1 class="section-title">Euro Pinoy</h1>
+        <div class="section-desc">Euro Pinoy offers a variety of food that combines European and Filipino dishes.</div>
+        <div class="shop-details">
+            <p><strong>Phone:</strong> (032) 328 5515</p>
+            <p><strong>Location:</strong> SBF No.2, Mactan EPZA, Maximo V. Patalinghug Jr. Avenue, Lapu-Lapu City, 6015, Cebu, PhilippinesLooc, Mandaue City, Cebu</p>
+            <p><strong>Opening Hours:</strong> 3:00 PM - 2:00 AM</p>
+        </div>
+    </div>
+    <div class="map-box">
+        <iframe width="100%" height="100%" style="border:0;" loading="lazy"
+        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3925.223873492864!2d123.97006657503549!3d10.323960589798682!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x33a999004020a19d%3A0xdbe01ba3eb9cd340!2sEuroPinoy%20Restaurant!5e0!3m2!1sen!2sph!4v1764432945596!5m2!1sen!2sph"></iframe>
+    </div>
+</section>
+
+<section id="Shop2">
+    <div class="overlay"></div>
+    <div class="shop-gallery">
+        <img src="shop2pic1.jpg" alt="Shop Image 1">
+        <img src="shop2pic2.jpg" alt="Shop Image 2">
+        <img src="shop2pic3.jpg" alt="Shop Image 3">
+    </div>
+    <div class="section-content">
+        <h1 class="section-title">Kuya Wins Street Foods</h1>
+        <div class="section-desc">offer a wide variety of affordable Filipino street food, such as grilled skewers,
+             fried snacks like proben, and other classic dishes.</div>
+        <div class="shop-details">
+            <p><strong>Phone:</strong> +63 916 148 7529</p>
+            <p><strong>Location:</strong> M.L. Quezon National Highway, Lapu-Lapu, 6015 Cebu</p>
+            <p><strong>Opening Hours:</strong> 8:00 AM - 8:00 PM</p>
+        </div>
+    </div>
+    <div class="map-box">
+        <iframe width="100%" height="100%" style="border:0;" loading="lazy"
+        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d62806.1444696687!2d123.87994766235347!3d10.311119303978822!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x33a999f98fb2edb9%3A0xaedeb7c186377b93!2sKUYA%20WIN%20STREET%20FOODS!5e0!3m2!1sen!2sph!4v1764484607780!5m2!1sen!2sph" ></iframe>
+    </div>
+</section>
+
+<section id="Shop3">
+    <div class="overlay"></div>
+    <div class="shop-gallery">
+        <img src="shop3pic1.jpg" alt="Shop Image 1">
+        <img src="shop3pic2.jpg" alt="Shop Image 2">
+        <img src="shop3pic3.jpg" alt="Shop Image 3">
+    </div>
+    <div class="section-content">
+        <h1 class="section-title">Susan's Pasalubong</h1>
+        <div class="section-desc">offers local Cebu delicacies and souvenirs, such as dried mangoes, rosquillos, otap, and other handmade items like guitars and jewelry.</div>
+        <div class="shop-details">
+            <p><strong>Phone:</strong> (032) 512 6226</p>
+            <p><strong>Location:</strong> 8XFF+VJV, M.L. Quezon National Highway, Lapu-Lapu, Cebu</p>
+            <p><strong>Opening Hours:</strong> 24/7</p>
+        </div>
+    </div>
+    <div class="map-box">
+        <iframe width="100%" height="100%" style="border:0;" loading="lazy"
+        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3925.2140544328677!2d123.9714567740816!3d10.324747367364523!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x33a99969bbf5bbaf%3A0x13712a0280008d97!2sSusan%E2%80%99s%20Pasalubong!5e0!3m2!1sen!2sph!4v1764484944092!5m2!1sen!2sph"></iframe>
+    </div>
+</section>
+
+<section id="Shop4">
+    <div class="overlay"></div>
+    <div class="shop-gallery">
+        <img src="shop4pic1.jpg" alt="Shop Image 1">
+        <img src="shop4pic2.jpg" alt="Shop Image 2">
+        <img src="shop4pic3.jpg" alt="Shop Image 3">
+    </div>
+    <div class="section-content">
+        <h1 class="section-title">Vinzjack Tasty Bread</h1>
+        <div class="section-desc">Offers a variety of baked goods, including burger buns and potentially other handcrafted breads.</div>
+        <div class="shop-details">
+            <p><strong>Phone:</strong> None</p>
+            <p><strong>Location:</strong> 8XFC+FVM, M.L. Quezon National Highway, Lapu-Lapu, 6015 Cebu</p>
+            <p><strong>Opening Hours:</strong> 24/7</p>
+        </div>
+    </div>
+    <div class="map-box">
+        <iframe width="100%" height="100%" style="border:0;" loading="lazy"
+        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3925.270608793123!2d123.96464147503549!3d10.320214989802132!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x33a999d5a23438d9%3A0x417e2bf333efdad8!2sVinzjack%20Tasty%20bread!5e0!3m2!1sen!2sph!4v1764598105159!5m2!1sen!2sph"></iframe>
+    </div>
+</section>
+
+<section id="Shop5">
+    <div class="overlay"></div>
+    <div class="shop-gallery">
+        <img src="shop5pic1.jpg" alt="Shop Image 1">
+        <img src="shop5pic2.jpg" alt="Shop Image 2">
+        <img src="shop5pic3.jpg" alt="Shop Image 3">
+    </div>
+    <div class="section-content">
+        <h1 class="section-title">Pasalubong Republique</h1>
+        <div class="section-desc">Euro Pinoy offers a variety of food that combines European and Filipino dishes.</div>
+        <div class="shop-details">
+            <p><strong>Phone:</strong> +63 956 235 4611</p>
+            <p><strong>Location:</strong> Beside Pusok Police Station and Barangay hall, Pusok Cemento, Lapu-Lapu, 6015 Cebu</p>
+            <p><strong>Opening Hours:</strong> 24/7</p>
+        </div>
+    </div>
+    <div class="map-box">
+        <iframe width="100%" height="100%" style="border:0;" loading="lazy"
+        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3925.218769505645!2d123.97156717408167!3d10.324369567371216!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x33a999bccefa731d%3A0xd169c61ea56cf1c6!2sPasalubong%20RepubliQ!5e0!3m2!1sen!2sph!4v1764599799329!5m2!1sen!2sph"></iframe>
+    </div>
+</section>
+
+<section id="Shop6">
+    <div class="overlay"></div>
+    <div class="shop-gallery">
+        <img src="shop6pic1.jpg" alt="Shop Image 1">
+        <img src="shop6pic2.jpg" alt="Shop Image 2">
+        <img src="shop6pic3.jpg" alt="Shop Image 3">
+    </div>
+    <div class="section-content">
+        <h1 class="section-title">Happy Manok</h1>
+        <div class="section-desc">Potentially one specializing in roasted chicken and other dishes like lechon belly, which is very popular in Cebu.</div>
+        <div class="shop-details">
+            <p><strong>Phone:</strong> (032) 238 4917</p>
+            <p><strong>Location:</strong> LJ& PL Store 8XFF+H8X, M.L. Quezon National Highway, Lapu-Lapu, 6015 Cebu</p>
+            <p><strong>Opening Hours:</strong> 9:00 AM - 8:30 PM</p>
+        </div>
+    </div>
+    <div class="map-box">
+        <iframe width="100%" height="100%" style="border:0;" loading="lazy"
+        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d7850.537241242167!2d123.9655170414477!3d10.320374359207861!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x33a99900026687e5%3A0xbdbf3ca386117a11!2sHappy%20Manok%20Pusok!5e0!3m2!1sen!2sph!4v1764606180745!5m2!1sen!2sph"></iframe>
+    </div>
+</section>
+
+<section id="Shop7">
+    <div class="overlay"></div>
+    <div class="shop-gallery">
+        <img src="shop7pic1.jpg" alt="Shop Image 1">
+        <img src="shop7pic2.jpg" alt="Shop Image 2">
+        <img src="shop7pic3.jpg" alt="Shop Image 3">
+    </div>
+    <div class="section-content">
+        <h1 class="section-title">Cariños</h1>
+        <div class="section-desc">Offers a variety of roasted pig and pork belly options for dining and catering, including a dining area, packed meals, and large-format packages for events.</div>
+        <div class="shop-details">
+            <p><strong>Phone:</strong> +63 956 220 8818</p>
+            <p><strong>Location:</strong> M.L. Quezon National Highway, Lapu-Lapu, 6015 Cebu</p>
+            <p><strong>Opening Hours:</strong> 1:00 PM - 10:00 PM</p>
+        </div>
+    </div>
+    <div class="map-box">
+        <iframe width="100%" height="100%" style="border:0;" loading="lazy"
+        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1962.6137381805997!2d123.9723234674257!3d10.32367188578514!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x33a999d44b77d5ab%3A0xe9807b95ae5ac00f!2sROYALTY&#39;S%20CAR%20WASH%20CENTER!5e0!3m2!1sen!2sph!4v1764607896681!5m2!1sen!2sph"></iframe>
+    </div>
+</section>
+
+<section id="Shop8">
+    <div class="overlay"></div>
+    <div class="shop-gallery">
+        <img src="shop8pic1.jpg" alt="Shop Image 1">
+        <img src="shop8pic2.jpg" alt="Shop Image 2">
+        <img src="shop8pic3.jpg" alt="Shop Image 3">
+    </div>
+    <div class="section-content">
+        <h1 class="section-title">Dapogan Restaurant</h1>
+        <div class="section-desc">Serves a variety of dishes, including popular items like Beef Bulalo, Beef Mami & Lomi, and various Silog meals.</div>
+        <div class="shop-details">
+            <p><strong>Phone:</strong> +63 993 509 4415</p>
+            <p><strong>Location:</strong> M.L. Quezon National Highway, Lapu-Lapu, 6015 Cebu</p>
+            <p><strong>Opening Hours:</strong> 1:00 PM - 10:00 PM</p>
+        </div>
+    </div>
+    <div class="map-box">
+        <iframe width="100%" height="100%" style="border:0;" loading="lazy"
+        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d18673.174466960987!2d123.94586413756889!3d10.297685208414741!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x33a999007c190943%3A0xd477245c852f0fdd!2sBeef%20Pares%20in%20Mactan%20(Dapogan)!5e0!3m2!1sen!2sph!4v1764608945864!5m2!1sen!2sph"></iframe>
+    </div>
+</section>
+
+<section id="Shop9">
+    <div class="overlay"></div>
+    <div class="shop-gallery">
+        <img src="shop9pic1.jpg" alt="Shop Image 1">
+        <img src="shop9pic2.jpg" alt="Shop Image 2">
+        <img src="shop9pic3.jpg" alt="Shop Image 3">
+    </div>
+    <div class="section-content">
+        <h1 class="section-title">Chenoi Apparel</h1>
+        <div class="section-desc">Focuses on customized apparel like jackets, uniforms, and other clothing, built on quality and customer service.</div>
+        <div class="shop-details">
+            <p><strong>Phone:</strong> (032) 266 3238</p>
+            <p><strong>Location:</strong> Therese Joy's Arcade, Quezon National Hwy, Lapu-Lapu, 6015 Cebu</p>
+            <p><strong>Opening Hours:</strong> 8:00 AM - 5:00 PM (Closed Sunday)</p>
+        </div>
+    </div>
+    <div class="map-box">
+        <iframe width="100%" height="100%" style="border:0;" loading="lazy"
+        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3925.219339565769!2d123.9715439750356!3d10.324323889798304!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x33a999d59d810b4b%3A0xba0689d4c66da503!2sChenoi%20Apparel!5e0!3m2!1sen!2sph!4v1764609969891!5m2!1sen!2sph"></iframe>
+    </div>
+</section>
+
+<section id="Contact">
+    <div class="section-content">
+        <h1 class="section-title">Contact Us</h1>
+        <div class="contact-wrapper">
+            <div class="contact-card">
+                <strong>Email</strong>
+                <span>localshopsinpusok
+                    lapulapucity@gmail.com</span>
+            </div>
+            <div class="contact-card">
+                <strong>Phone</strong>
+                <span>+63 912 345 6789</span>
+            </div>
+            <div class="contact-card">
+                <strong>Address</strong>
+                <span>Mandaue City, Cebu</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="About">
+    <div class="about-wrapper">
+        <div class="about-card">
+            <h1 class="about-title">Supporting Local Shops in pusok Lapu-lapu City</h1>
+            <div class="about-text">
+                Welcone! this website is dedicated to supporting local shops in Pusok, 
+                -Lapu City. Our mission is to sustain our community and prevent economic leakage. Remember, 
+                locals matter and every purchase here helps our neighbors thrive.
+            </div>
+        </div>
+    </div>
+</section>
+
+</body>
+</html>
